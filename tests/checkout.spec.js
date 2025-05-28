@@ -46,7 +46,7 @@ test.describe("Checkout Process", () => {
 
     //checkout process
     const checkoutPage = new CheckoutPage(page);
-    await checkoutPage.checkoutProcess();
+    await checkoutPage.checkoutProcess("Gupita", "Adeline", "55890");
 
     //assert the checkout complete page
     await expect(page.getByText("Thank you for your order!")).toBeVisible();
