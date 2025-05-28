@@ -9,3 +9,5 @@ node_modules/
 # Misc
 .env
 package-lock.json
+allure-report/
+allure-results/
