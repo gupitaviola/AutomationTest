@@ -7,12 +7,18 @@ class LoginPage {
 
     constructor(page) {
         this.page = page;
-        this.usernameInput = page.getByTestId('username');
-        this.passwordInput = page.getByTestId('password');
-        this.loginButton = page.getByTestId('login-button');
-        this.pageTitle = page.getByText('Swag Labs');
-        this.errorMessage = page.getByTestId('error');
+        this.usernameInput = page.getByTestId("username");
+        this.passwordInput = page.getByTestId("password");
+        this.loginButton = page.getByTestId("login-button");
+        this.pageTitle = page.getByText("Swag Labs");
+        this.errorMessage = page.getByTestId("error");
     }
+
+    /**
+     * Login with the given credentials
+     * @param {string} username - The username to use
+     * @param {string} password - The password to use
+     */
     async login(username, password) {
         await expect(this.pageTitle).toBeVisible();
         await expect(this.loginButton).toBeVisible();
@@ -21,8 +27,12 @@ class LoginPage {
         await this.loginButton.click();
     }
 
-    async getErrorMessage() {
-        return this.errorMessage.textContent();
+    /**
+     * Assert that the error message matches the expected message
+     * @param {string} actualMessage - The expected error message
+     */
+    async assertErrorMessage(actualMessage) {
+        await expect(this.errorMessage).toHaveText(actualMessage);
     }
 }
 
