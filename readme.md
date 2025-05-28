@@ -28,10 +28,25 @@ npm install
 npx playwright install
 ```
 
+### 4. Install Allure Report
+```bash
+npm install -g allure-commandline
+```
+
+---
+
+## 🔧 Environment Setup
+Before running tests, create a `.env` file in the **project root directory** with the following keys:
+```bash
+BASE_URL=
+STANDARD_USER=
+PASSWORD=
+```
+For the value please visit the website: https://www.saucedemo.com/
+
 ---
 
 ## 🚀 Running Tests
-
 ### Run all tests
 ```bash
 npx playwright test

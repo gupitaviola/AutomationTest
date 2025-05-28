@@ -21,14 +21,19 @@ class CheckoutPage {
         this.finishButton = page.getByTestId("finish");
     }
 
-    async checkoutProcess() {
+    /**
+     * @param {string} firstName - The first name to use
+     * @param {string} lastName - The last name to use
+     * @param {string} zipCode - The zip code to use
+     */
+    async checkoutProcess(firstName, lastName, zipCode) {
         //click the checkout button
         await this.checkoutButton.click();
 
         //fill the checkout information
-        await this.firstNameInput.fill("Gupita");
-        await this.lastNameInput.fill("Adeline");
-        await this.zipCodeInput.fill("55789");
+        await this.firstNameInput.fill(firstName);
+        await this.lastNameInput.fill(lastName);
+        await this.zipCodeInput.fill(zipCode);
 
         //click the continue button
         await this.continueButton.click();

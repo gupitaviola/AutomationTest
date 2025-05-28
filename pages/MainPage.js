@@ -17,7 +17,9 @@ class MainPage {
      * @param {string} productName - The name of the product (e.g., 'Sauce Labs Backpack')
      */
     async cartAction(action, productName) {
-        const convertProductName = productName.toLowerCase().replace(/\s+/g, '-'); //replace one or more spaces with '-'
+        const convertProductName = productName.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[.()]/g, '\\$&'); //replace one or more spaces with '-'
         if (action === 'add') {
             const addToCartButton = `add-to-cart-${convertProductName}`;
             await this.page.getByTestId(addToCartButton).scrollIntoViewIfNeeded();
