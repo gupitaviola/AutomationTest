@@ -1,72 +1,52 @@
 // @ts-check
 import { test, expect } from "@playwright/test";
-import { BASE_URL, STANDARD_USER, PASSWORD } from '../config/env'; 
+import { STANDARD_USER, PASSWORD } from '../config/env'; 
+import { LoginPage } from '../pages/LoginPage';
+import { MainPage } from '../pages/MainPage';
+import { CartPage } from '../pages/CartPage';
+import { CheckoutPage } from '../pages/CheckoutPage';
 
-const PRODUCTSADD = [
-  {
-    id: "item_4_title_link",
-    name: "Sauce Labs Backpack",
-    price: '29.99',
-    idAdd: "add-to-cart-sauce-labs-backpack",
-  },
-  {
-    id: "item_0_title_link",
-    name: "Sauce Labs Bolt T-Shirt",
-    price: '15.99',
-    idAdd: "add-to-cart-sauce-labs-bolt-t-shirt",
-  },
-  {
-    id: "item_1_title_link",
-    name: "Sauce Labs Bike Light",
-    price: '9.99',
-    idAdd: "add-to-cart-sauce-labs-bike-light",
-  }
-]
+const PRODUCTS = [
+    {
+      name: "Sauce Labs Backpack",
+      price: '29.99',
+    },
+    {
+      name: "Sauce Labs Bolt T-Shirt",
+      price: '15.99',
+    },
+    {
+      name: "Sauce Labs Bike Light",
+      price: '9.99',
+    }
+  ]
 
 test.describe("Checkout Process", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(BASE_URL);
-    await expect(page.getByText("Swag Labs")).toBeVisible()
-
-    await page.getByTestId("username").fill(STANDARD_USER);
-    await page.getByTestId("password").fill(PASSWORD);
-    await page.getByTestId("login-button").click();
+    await page.goto("/");
+    const loginPage = new LoginPage(page);
+    await loginPage.login(STANDARD_USER, PASSWORD);
     
-    await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
-
-    //add several products
-    for(const product of PRODUCTSADD) {
-        await page.getByTestId(product.idAdd).click();
-      }
+    await expect(page).toHaveURL("/inventory.html");
+    await expect(page.getByText("Products")).toBeVisible();
   }); 
 
-  test("User can complete the checkout process", async ({ page }) => {
-    //click the cart button
-    await page.getByTestId("shopping-cart-link").click();
+  test("User can complete the checkout process with several products", async ({ page }) => {
+    //add several products
+    const mainPage = new MainPage(page);
+    for(const product of PRODUCTS) {
+        await mainPage.cartAction("add", product.name);
+      }
 
-    //assert the cart page
+    //open the cart page  
+    const cartPage = new CartPage(page);
+    await cartPage.openCartPage();
+    await expect(page).toHaveURL("/cart.html");
     await expect(page.getByText("Your Cart")).toBeVisible();
-    await expect(page.getByTestId("checkout")).toBeVisible();
 
-    //click the checkout button
-    await page.getByTestId("checkout").click();
-
-    //assert the checkout information page
-    await expect(page.getByText("Checkout: Your Information")).toBeVisible(); 
-
-    //fill the checkout information
-    await page.getByTestId("firstName").fill("Gupita");
-    await page.getByTestId("lastName").fill("Viola");
-    await page.getByTestId("postalCode").fill("55184");
-    await page.getByTestId("continue").click();
-
-    //assert the checkout overview page
-    await expect(page.getByText("Checkout: Overview")).toBeVisible();
-    await expect(page.getByText("SauceCard #31337")).toBeVisible();
-    await expect(page.getByText("Free Pony Express Delivery!")).toBeVisible();
-    
-    //click the finish button
-    await page.getByTestId("finish").click();
+    //checkout process
+    const checkoutPage = new CheckoutPage(page);
+    await checkoutPage.checkoutProcess();
 
     //assert the checkout complete page
     await expect(page.getByText("Thank you for your order!")).toBeVisible();
@@ -78,4 +58,19 @@ test.describe("Checkout Process", () => {
     expect(await badgeText).not.toBeVisible();
   })
 
+  /*
+    Expected issue: the checkout button should be disabled when the cart is empty.
+    This test confirms that users cannot proceed to checkout without adding items to the cart.
+  */
+  test("User cannot continue the checkout process if the cart is empty", async ({ page }) => {
+    //open the cart page  
+    const cartPage = new CartPage(page);
+    await cartPage.openCartPage();
+    await expect(page).toHaveURL("/cart.html");
+    await expect(page.getByText("Your Cart")).toBeVisible();
+
+    //assert the checkout button is disabled
+    const checkoutButton = page.getByTestId("checkout");
+    await expect (checkoutButton).toBeDisabled();
+  })
 })
